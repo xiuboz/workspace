@@ -11,11 +11,11 @@ class AbstractWorkspace(abc.ABC):
     ):
         # print(path, parent.path() if parent else None)
         self._parent: 'AbstractWorkspace' = parent
-        self._path: Path = Path(path) if self._parent is None else self._parent._subpath(path)
+        self._path: Path = Path(path) if self._parent is None else self._parent.subpath(path)
         self._path.mkdir(parents=True, exist_ok=True)  # make sure our _path exists; creat it otherwise.
         pass
     
-    def _subpath(self, name: str) -> Path:
+    def subpath(self, name: str) -> Path:
         return self._path.joinpath(name)
 
     @abc.abstractmethod
