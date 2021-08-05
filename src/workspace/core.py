@@ -1,6 +1,6 @@
 import abc
-import os
 from pathlib import Path
+
 
 class AbstractWorkspace(abc.ABC):
 
@@ -27,6 +27,10 @@ class AbstractWorkspace(abc.ABC):
 
     def path(self) -> Path:
         return self._path
+
+    @abc.abstractmethod
+    def flatten(self):
+        pass
     
     def __str__(self) -> str:
         return str(self.path())
@@ -40,7 +44,6 @@ class Workspace(AbstractWorkspace):
         parent: AbstractWorkspace = None,
     ): 
         super().__init__(path, parent)
-        
     
     def subspace(
         self, 
@@ -48,6 +51,12 @@ class Workspace(AbstractWorkspace):
     ) -> AbstractWorkspace:
         return Workspace(name, self)
 
-    
+    def flatten(self):
+        for cp in self.path().iterdir():
+            if cp.is_file():
+                yield (self.path().name, cp.name), cp
+            elif cp.is_dir():
+                for fcp in self.subspace(cp.name).flatten():
+                    _cp, _p = fcp
+                    yield (self.path().name, *_cp), _p
 
-    
